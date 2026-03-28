@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Cloud QR Forge | Instant QR Code Generator</title>
+    <!-- Google Fonts & simple styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f5 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* main cloud card */
+        .cloud-card {
+            max-width: 720px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 3rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .cloud-header {
+            background: #0b2b3f;
+            background: linear-gradient(135deg, #0f2c3b 0%, #1a4a6f 100%);
+            padding: 1.8rem 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .cloud-header h1 {
+            font-weight: 700;
+            font-size: 1.9rem;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .cloud-header h1 span {
+            background: rgba(255,255,240,0.2);
+            padding: 0.2rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .cloud-sub {
+            margin-top: 10px;
+            opacity: 0.85;
+            font-weight: 400;
+            font-size: 0.95rem;
+        }
+
+        .badge-cloud {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #2c6e9e50;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+
+        /* content */
+        .content-panel {
+            padding: 2rem 2rem 2rem 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.8rem;
+        }
+
+        label {
+            font-weight: 600;
+            color: #1e2f3e;
+            display: block;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+            letter-spacing: -0.2px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            font-family: 'Inter', monospace;
+            background: #ffffff;
+            border: 1.5px solid #dce5ec;
+            border-radius: 2rem;
+            transition: all 0.2s;
+            outline: none;
+            color: #0f2c3b;
+            font-weight: 500;
+        }
+
+        .input-field:focus {
+            border-color: #2c7cb6;
+            box-shadow: 0 0 0 3px rgba(44,124,182,0.2);
+        }
+
+        .textarea-field {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .row-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0 1.2rem;
+            align-items: center;
+        }
+
+        .btn {
+            border: none;
+            background: #eef2f7;
+            padding: 0.8rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #1f6390;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .btn-primary:hover {
+            background: #0f4b6e;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -12px #1f639050;
+        }
+
+        .btn-secondary {
+            background: #e9edf2;
+            color: #2c3e50;
+            border: 1px solid #cdd9e6;
+        }
+
+        .btn-secondary:hover {
+            background: #dfe6ed;
+        }
+
+        .qr-stage {
+            background: #fbfefd;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin: 1rem 0 0.8rem;
+            text-align: center;
+            border: 1px dashed #bdd4e4;
+            transition: all 0.2s;
+        }
+
+        .qr-placeholder {
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .qr-img {
+            max-width: 220px;
+            width: 100%;
+            height: auto;
+            background: white;
+            padding: 12px;
+            border-radius: 1.5rem;
+            box-shadow: 0 12px 25px -10px rgba(0,0,0,0.1);
+            transition: 0.2s;
+        }
+
+        .info-note {
+            font-size: 0.8rem;
+            color: #5b7c99;
+            background: #eef3fc;
+            padding: 0.6rem 1rem;
+            border-radius: 2rem;
+            display: inline-block;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 3px solid #cddfea;
+            border-radius: 50%;
+            border-top-color: #1f6390;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #c2410c;
+            background: #fff4ed;
+            padding: 0.75rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .footer-badge {
+            background: #f1f5f9;
+            margin-top: 0.8rem;
+            padding: 0.9rem 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #4a627a;
+            border-top: 1px solid #e2edf2;
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .download-area {
+            margin-top: 0.8rem;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        @media (max-width: 500px) {
+            .content-panel { padding: 1.5rem; }
+            .cloud-header h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cloud-card">
+    <div class="cloud-header">
+        <h1>
+            ☁️ CLOUD QR FORGE 
+            <span>API-Powered</span>
+        </h1>
+        <div class="cloud-sub">Cloud-based QR generation · Real‑time · Global edge</div>
+        <div class="badge-cloud">
+            ⚡ cloud processing | 🌐 hosted on GitHub Pages | 🧩 remote API
+        </div>
+    </div>
+
+    <div class="content-panel">
+        <div class="input-group">
+            <label>📝 Enter text, URL, or any data</label>
+            <textarea id="qrDataInput" class="input-field textarea-field" placeholder="https://yourwebsite.com or any text, vCard, Wi-Fi config, etc...&#10;Example: https://github.com or 'Hello Cloud World!'"></textarea>
+        </div>
+
+        <div class="row-buttons">
+            <button id="generateBtn" class="btn btn-primary">✨ Generate QR Code (Cloud API)</button>
+            <button id="clearBtn" class="btn btn-secondary">🗑️ Clear</button>
+        </div>
+
+        <!-- QR display area with cloud integration status -->
+        <div class="qr-stage" id="qrStage">
+            <div id="qrDisplay" class="qr-placeholder">
+                <div class="info-note">
+                    🌩️ Ready — Enter content and click generate. QR will be created via cloud service.
+                </div>
+                <div style="font-size: 3rem; opacity: 0.4;">⬇️</div>
+            </div>
+        </div>
+        
+        <!-- dynamic download / share buttons appear when QR is ready -->
+        <div id="downloadActions" style="display: none;" class="download-area">
+            <button id="downloadPngBtn" class="btn btn-secondary">📥 Download QR (PNG)</button>
+            <button id="copyLinkBtn" class="btn btn-secondary">🔗 Copy QR Image URL</button>
+        </div>
+        <div id="errorMessageArea"></div>
+    </div>
+    <div class="footer-badge">
+        <span>⚙️ Cloud QR API: GoQR.me / QR Server</span>
+        <span>☁️ Serverless architecture · No local processing</span>
+        <span>📡 Real-time from cloud CDN</span>
+    </div>
+</div>
+
+<script>
+    // ------------------------------------------------------------------
+    // CLOUD-BASED QR CODE GENERATOR
+    // Uses GoQR.me free cloud API (HTTPS, reliable, returns PNG image)
+    // All QR generation is performed remotely -> demonstrates cloud computing
+    // and API integration. Deploy to GitHub Pages: fully static + cloud processing.
+    // ------------------------------------------------------------------
+    
+    // DOM elements
+    const textarea = document.getElementById('qrDataInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const qrDisplayDiv = document.getElementById('qrDisplay');
+    const downloadActionsDiv = document.getElementById('downloadActions');
+    const errorMessageArea = document.getElementById('errorMessageArea');
+    const downloadPngBtn = document.getElementById('downloadPngBtn');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    
+    // current active QR code image URL (blob or dataURL? but we will store the cloud generated URL)
+    let currentQRImageUrl = null;
+    let currentRawData = '';
+    
+    // Helper: clear error messages
+    function clearError() {
+        errorMessageArea.innerHTML = '';
+    }
+    
+    function showError(message) {
+        errorMessageArea.innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
+    }
+    
+    // loading state inside QR stage
+    function setLoadingState(isLoading) {
+        if (isLoading) {
+            qrDisplayDiv.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                    <div class="loader"></div>
+                    <div class="info-note">☁️ Contacting cloud QR service ...</div>
+                </div>
+            `;
+            downloadActionsDiv.style.display = 'none';
+            currentQRImageUrl = null;
+        } else {
+            // not loading - we will later fill
+        }
+    }
+    
+    // generate QR via CLOUD API (GoQR.me)
+    // This function demonstrates external cloud-based processing.
+    // API endpoint: https://api.qrserver.com/v1/create-qr-code/ (size, data, margin)
+    // We'll use the QRServer API because it's free, fast, and returns PNG directly.
+    // Alternative: we also use GoQR style: https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=...
+    // That's a real cloud microservice. Perfect for cloud computing demo.
+    async function generateCloudQR(data) {
+        if (!data || data.trim() === '') {
+            showError('Please enter some text or URL before generating QR code.');
+            return false;
+        }
+        
+        // Trim but preserve actual content
+        const trimmedData = data.trim();
+        if (trimmedData.length === 0) {
+            showError('Empty input. Provide valid content.');
+            return false;
+        }
+        
+        clearError();
+        setLoadingState(true);
+        
+        // QR Code size: 280x280 for good resolution, margin 1
+        // Using qrserver.com cloud API (v1) - returns image bytes
+        const qrSize = 280;
+        // encodeURIComponent for safe URL
+        const encodedData = encodeURIComponent(trimmedData);
+        const cloudUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodedData}&margin=10&format=png`;
+        
+        // We'll fetch the image from cloud to confirm it's accessible and store the URL
+        // But we want to display it directly. To demonstrate cloud integration, we can simply set img src to the cloud URL.
+        // However, the QR server returns PNG. If we just set img.src, it will trigger a network request to cloud API.
+        // This is classic cloud-based generation: each request to API renders fresh QR.
+        // But note: if we set img.src = cloudUrl, it calls remote API each time. Perfect.
+        // But we need to handle errors: broken images? we can test fetch for status.
+        
+        // To provide robust error handling, we'll pre-check with fetch HEAD? but we can also rely on image onerror.
+        // Simpler: create an Image element, test onload/onerror.
+        return new Promise((resolve) => {
+            const testImg = new Image();
+            testImg.onload = () => {
+                // cloud generated successfully
+                const finalUrl = cloudUrl;  // direct API endpoint
+                // display QR code in stage
+                displayQRImage(finalUrl, trimmedData);
+                resolve(true);
+            };
+            testImg.onerror = () => {
+                setLoadingState(false);
+                showError('Cloud QR service error: unable to generate QR. Please check your input or network connectivity.');
+                resolve(false);
+            };
+            testImg.src = cloudUrl;
+        });
+    }
+    
+    // display QR image and store current URL for download
+    function displayQRImage(imageUrl, rawData) {
+        currentQRImageUrl = imageUrl;
+        currentRawData = rawData;
+        
+        // build fresh QR stage content
+        qrDisplayDiv.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <img class="qr-img" id="generatedQrImg" src="${imageUrl}" alt="Cloud generated QR Code" style="max-width: 240px; width:100%;">
+                <div class="info-note" style="background: #e1f0fa;">
+                    ✅ QR generated via <strong>cloud API</strong> (QRServer) · remote processing
+                </div>
+                <div style="font-size: 0.7rem; color: #527a9b;">Data: ${escapeHtml(rawData.length > 50 ? rawData.substring(0, 50) + '…' : rawData)}</div>
+            </div>
+        `;
+        downloadActionsDiv.style.display = 'flex';
+        // also ensure error cleared
+        clearError();
+    }
+    
+    // helper escape HTML for safe display
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    // Download QR as PNG (convert the current cloud image)
+    // Because the QR code URL is from an external API, we can fetch it as blob and trigger download
+    async function downloadQR() {
+        if (!currentQRImageUrl) {
+            showError('No QR code available. Generate a QR code first.');
+            return;
+        }
+        try {
+            // fetch the cloud image as blob (demonstrates cloud asset retrieval)
+            const response = await fetch(currentQRImageUrl);
+            if (!response.ok) throw new Error('Failed to fetch cloud image');
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `cloud_qr_${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
+            // optional success indicator
+            const tempMsg = document.createElement('div');
+            tempMsg.className = 'info-note';
+            tempMsg.style.position = 'fixed';
+            tempMsg.style.bottom = '20px';
+            tempMsg.style.right = '20px';
+            tempMsg.style.background = '#1f6390';
+            tempMsg.style.color = 'white';
+            tempMsg.innerText = '✅ QR downloaded from cloud storage';
+            document.body.appendChild(tempMsg);
+            setTimeout(() => tempMsg.remove(), 2000);
+        } catch (err) {
+            console.error(err);
+            showError('Download failed: Could not retrieve QR image from cloud.');
+        }
+    }
+    
+    // copy QR image URL (the cloud API endpoint with data)
+    async function copyQRLink() {
+        if (!currentQRImageUrl) {
+            showError('No QR image URL available. Generate QR code first.');
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(currentQRImageUrl);
+            // notify user
+            const notify = document.createElement('div');
+            notify.innerText = '📋 Cloud QR image URL copied to clipboard!';
+            notify.style.position = 'fixed';
+            notify.style.bottom = '20px';
+            notify.style.left = '20px';
+            notify.style.backgroundColor = '#1e3a4d';
+            notify.style.color = 'white';
+            notify.style.padding = '8px 16px';
+            notify.style.borderRadius = '40px';
+            notify.style.fontSize = '0.8rem';
+            notify.style.zIndex = '999';
+            document.body.appendChild(notify);
+            setTimeout(() => notify.remove(), 2000);
+        } catch (err) {
+            showError('Could not copy link, but you can right-click the QR image and copy address.');
+        }
+    }
+    
+    // Clear everything: reset input, remove QR, hide download buttons
+    function resetAll() {
+        textarea.value = '';
+        currentQRImageUrl = null;
+        currentRawData = '';
+        // reset QR placeholder to neutral state
+        qrDisplayDiv.innerHTML = `
+            <div class="info-note">
+                🌩️ Ready — Enter content and click generate. QR will be created via cloud service.
+            </div>
+            <div style="font-size: 3rem; opacity: 0.4;">⬇️</div>
+        `;
+        downloadActionsDiv.style.display = 'none';
+        clearError();
+    }
+    
+    // Generate action: read data, call cloud api
+    async function handleGenerate() {
+        const rawInput = textarea.value;
+        if (!rawInput || rawInput.trim() === '') {
+            showError('Please enter some content (text, URL, etc.) to generate QR code.');
+            return;
+        }
+        await generateCloudQR(rawInput);
+    }
+    
+    // Event listeners
+    generateBtn.addEventListener('click', handleGenerate);
+    clearBtn.addEventListener('click', resetAll);
+    if (downloadPngBtn) downloadPngBtn.addEventListener('click', downloadQR);
+    if (copyLinkBtn) copyLinkBtn.addEventListener('click', copyQRLink);
+    
+    // Bonus: provide example default content to demo cloud computing quickly (but not auto-generate, just suggestion)
+    // Add helper note on load: prefill example? We can set placeholder example, but not mandatory.
+    // For better user experience, set a demo suggestion? we can optionally set a demo if empty, but better to keep clean.
+    // Also support Enter key? not required but nice: Ctrl+Enter generate
+    textarea.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            handleGenerate();
+        }
+    });
+    
+    // initial info: because it's cloud based we can show additional architecture note 
+    const styleNote = document.createElement('style');
+    styleNote.textContent = `
+        .qr-img {
+            transition: transform 0.1s ease;
+        }
+        .qr-img:hover {
+            transform: scale(1.02);
+        }
+    `;
+    document.head.appendChild(styleNote);
+    
+    // Optional: log to console that cloud QR service is ready
+    console.log('☁️ Cloud QR Generator initialized — uses remote QRServer API (cloud processing)');
+    
+    // additional functionality: show that the application uses external API and hosted via GitHub Pages
+    const cloudContext = document.createElement('div');
+    cloudContext.style.display = 'none';
+    document.body.appendChild(cloudContext);
+    
+    // For accessibility & clarity — add small dynamic status: show that it's using remote cloud processing
+    const observer = new MutationObserver(() => {});
+    // just for completeness.
+    
+    // If a user pastes a huge content it's fine. QR code API can handle up to few thousand characters but reasonable limits.
+    // We're demonstrating core cloud computing principles.
+</script>
+</body>
+</html>
